@@ -1,0 +1,82 @@
+
+import requests
+import json
+import html2text
+import zmq
+
+context = zmq.Context()
+socket = context.socket(zmq.REP)
+socket.bind("tcp://*:5555")
+
+class MakeApiCall:
+
+    def __init__(self, book_title):
+        print(book_title)
+        self._call = self.build_api_call(book_title)
+        self._summary = self.get_data(self._call)
+
+    def get_data(self, call):
+        response = requests.get(f"{call}")
+        if response.status_code == 200:
+            
+            jsonData = json.loads(response.content)
+            pageIDKey = jsonData['query']['pages']
+            if '-1' in pageIDKey:
+                return "Error: Book Match Not Found"
+            first_key = list(pageIDKey)[0]
+            html = jsonData['query']['pages'][first_key]['extract']
+            summary = html2text.html2text(html)
+            summary = self.clean_format(summary)
+            return summary
+        else:
+            print(f"Error:{response.status_code}")
+            return "Error: Book Match Not Found"
+
+    def get_summary(self):
+        return self._summary
+
+    def clean_format(self, unformatted_summary):
+        loop_counter = 0
+        formatted_summary = ''
+        for x in unformatted_summary:
+            if (loop_counter < len(unformatted_summary) - 2) and str(x) != "*" and str(x) != "_":
+                formatted_summary = formatted_summary + str(x)
+            formatted_summary = formatted_summary.replace('\n',' ')
+            loop_counter += 1
+        return formatted_summary
+
+    def build_api_call(self, book):
+        space = "%20"
+        api_base = "https://en.wikipedia.org/w/api.php?action=query&prop=extracts&format=json&exintro=&titles="
+        converted_title = ""
+        for x in book:
+            if x == " ":
+                converted_title = converted_title + space
+            else:
+                converted_title = converted_title + str(x)
+        full_call = api_base + converted_title
+        return full_call
+
+
+while True:
+    #  Wait for next request from client
+    book_title = socket.recv()
+    book_title = str(book_title)
+    clean_book_title = ''
+    loop_counter = 0
+    #  Clean book title format
+    for x in book_title:
+        if loop_counter > 1 and loop_counter < len(book_title) - 1:
+            clean_book_title = clean_book_title + str(x)
+        loop_counter += 1
+
+    #  Generate API call and get summary
+    api_call = MakeApiCall(clean_book_title)
+    summary = api_call.get_summary()
+
+    #  Send reply back to requester
+    socket.send_string(summary)
+
+
+
+
