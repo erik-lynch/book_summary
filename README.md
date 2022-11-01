@@ -1,5 +1,5 @@
 # Book Summary
-Microservice that receives a book title, and returns the summary provided on the book's wikipedia entry. The microservice pulls the book summary from Wikipedia using 
+Microservice that receives a book title, and returns the summary provided on the book's wikipedia entry. The microservice pulls the book summary using Wikipedia's API.
 
 Allows for the quick retrieval of a book summary using only the book's title. 
 
