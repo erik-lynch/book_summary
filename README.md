@@ -27,3 +27,5 @@ message = str(message)
 message = message[2:-1]
 
 That's all! You may use the summary in any way you need once it has been stored in a variable. 
+
+<img width="1057" alt="image" src="https://user-images.githubusercontent.com/114192977/199138213-a7e2f25a-4a3e-45c4-a5f1-bb628a9ad64d.png">
