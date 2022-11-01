@@ -12,6 +12,7 @@ To connect to the server, use the following code:
 context = zmq.Context()
 
 socket = context.socket(zmq.REQ)
+
 socket.connect("tcp://192.168.50.37:5555")
 
 To make a request send the book title as a string:
@@ -23,7 +24,9 @@ socket.send_string("BOOK TITLE GOES HERE")
 To receive and format the response, insert the following code:
 
 message = socket.recv()
+
 message = str(message)
+
 message = message[2:-1]
 
 That's all! You may use the summary in any way you need once it has been stored in a variable. 
