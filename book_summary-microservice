@@ -1,3 +1,5 @@
+# Citation for the following program:
+# Adapted from https://zeromq.org/languages/python/
 
 import requests
 import json
